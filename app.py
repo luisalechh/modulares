@@ -33,7 +33,7 @@ login_manager.login_view = "login"  # Redirige a la vista de login si no ha inic
 users = {
     "admin": {"password": "1234", "role": "admin"},
     "ZRAMOS": {"password": "zramos", "role": "user"},
-    "LCHANQUETTI":{{"password": "LCHANQUETTI1", "role": "user"}}
+    "LCHANQUETTI":{"password": "LCHANQUETTI1", "role": "user"}
 }
 
 
