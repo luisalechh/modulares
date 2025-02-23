@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}reporte{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Mantiene "Cerrar Sesión" visible */
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .sidebar a:hover {
+            background: #495057;
+        }
+        .subtema {
+            display: block;  /* Asegura que el enlace ocupe toda la línea */
+            margin-left: 20px;  /* Espaciado hacia la derecha */
+            padding-left: 10px; /* Un pequeño padding interno */
+            font-size: 0.9rem; /* Opcional: reducir un poco el tamaño del texto */
+       }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra Lateral -->
+    <div class="sidebar">
+        <div>
+            <h4>Bienvenido, {{ username }}</h4>
+            <a href="{{ url_for('home') }}">Inicio</a>
+
+            {% if role == "admin" %}
+           	    <!-- reporte con Subtemas Expandibles -->
+                <a href="#reporteMenu" data-bs-toggle="collapse" class="dropdown-toggle">Reportes</a>
+            	<div class="collapse" id="reporteMenu">
+                		<a class="subtema" href="{{ url_for('reporte') }}">General</a>
+                		<a class="subtema" href="{{ url_for('reporte_ventas') }}">Reporte de Ventas</a>
+                		<a class="subtema" href="{{ url_for('analisis_clientes') }}">Análisis de Clientes</a>
+            	</div>
+            	<!-- Laboratorios con Subtemas Expandibles -->
+            	<a href="#laboratorioMenu" data-bs-toggle="collapse" class="dropdown-toggle">Laboratorios</a>
+            	<div class="collapse" id="laboratorioMenu">
+                	<a class="subtema" href="{{ url_for('laboratorio_flujograndesvolumenes') }}">Laboratorio de Flujos y Grandes Volúmenes</a>
+                	<a class="subtema" href="{{ url_for('laboratorio_presion') }}">Laboratorio de Presión</a>
+                	<a class="subtema" href="{{ url_for('laboratorio_masa') }}">Laboratorio de Masa</a>
+            	</div>
+                <a href="{{ url_for('firma_electronica') }}">Firma electrónica</a>
+	        {% endif %}
+
+	        {% if role == "user" %}
+            	<!-- Laboratorios con Subtemas Expandibles -->
+            	<a href="#laboratorioMenu" data-bs-toggle="collapse" class="dropdown-toggle">Laboratorios</a>
+            	<div class="collapse" id="laboratorioMenu">
+                	<a class="subtema" href="{{ url_for('laboratorio_flujograndesvolumenes') }}">Laboratorio de Flujos y Grandes Volúmenes</a>
+                	<a class="subtema" href="{{ url_for('laboratorio_presion') }}">Laboratorio de Presión</a>
+                	<a class="subtema" href="{{ url_for('laboratorio_masa') }}">Laboratorio de Masa</a>
+            	</div>
+                <a href="{{ url_for('firma_electronica') }}">Firma electrónica</a>
+	        {% endif %}
+            
+        </div>
+
+
+        <!-- Cerrar Sesión siempre visible -->
+        <div>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

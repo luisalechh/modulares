@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Subir JSON{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="card border-dark mb-3">
+            <div class="card-header bg-dark text-white">Subir Archivo JSON</div>
+            <div class="card-body">
+                <form action="{{ url_for('subir_json') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Seleccionar archivo JSON:</label>
+                        <input type="file" class="form-control" id="archivo" name="archivo" accept="application/json" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Subir</button>
+                </form>
+                
+                {% if json_subido %}
+                    <hr>
+                    <p>Archivo subido: <strong>{{ json_subido }}</strong></p>
+                    <a href="{{ url_for('descargar_json', filename=json_subido) }}" class="btn btn-success">Descargar JSON</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

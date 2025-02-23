@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Grandes Volúmenes y Flujo{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <!-- Contenedor con borde y título "Datos Personales" -->
+        <div class="card border-dark mb-3">
+            <div class="card-header bg-dark text-white">Datos Personales</div>
+            <div class="card-body">
+                <form action="{{ url_for('generar_pdf') }}" method="post">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label">Empresa:</label>
+                        <input type="text" class="form-control" id="empresa" name="empresa" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="detalle" class="form-label">Detalle:</label>
+                        <textarea class="form-control" id="detalle" name="detalle" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Imprimir PDF</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

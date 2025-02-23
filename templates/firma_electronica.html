@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Firma electrónica{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="card border-dark mb-3">
+            <div class="card-header bg-dark text-white">Configuración</div>
+            <div class="card-body">
+                <form action="{{ url_for('subir_pdf') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="key" class="form-label">Key Spire:</label>
+                        <input type="text" class="form-control" id="key" name="key" required >
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="posicionx" class="form-label">Posición x:</label>
+                            <input type="number" class="form-control" id="posicionx" name="posicionx" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="posiciony" class="form-label">Posición y:</label>
+                            <input type="number" class="form-control" id="posiciony" name="posiciony" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="ancho" class="form-label">Ancho de la firma:</label>
+                            <input type="number" class="form-control" id="ancho" name="ancho" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="altura" class="form-label">Altura de la firma:</label>
+                            <input type="number" class="form-control" id="altura" name="altura" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Subir PDF:</label>
+                        <input type="file" class="form-control" id="archivo" name="archivo" accept="application/pdf" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Subir</button>
+                </form>
+                
+                {% set key = request.form.get('key') %}
+                {% set posicionx = request.form.get('posicionx') %}
+                {% set posiciony = request.form.get('posiciony') %}
+                {% set ancho = request.form.get('ancho') %}
+                {% set altura = request.form.get('altura') %}
+
+                {% if pdf_subido %}
+                    <hr>
+                    <p>Archivo subido: <strong>{{ pdf_subido }}</strong></p>
+                    <a href="{{ url_for('descargar_pdf', filename=pdf_subido, 
+                    key=key, 
+                    posicionx=posicionx, 
+                    posiciony=posiciony, 
+                    ancho=ancho, 
+                    altura=altura) }}" 
+                    class="btn btn-success">Descargar PDF Modificado</a>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
