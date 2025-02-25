@@ -24,6 +24,9 @@ import plotly.express as px
 from flask import Flask
 from dash.dependencies import Input, Output
 
+from functools import wraps
+from flask import abort
+
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
@@ -39,10 +42,21 @@ login_manager.login_view = "login"  # Redirige a la vista de login si no ha inic
 # Base de datos ficticia de usuarios
 users = {
     "admin": {"password": "1234", "role": "admin"},
-    "ZRAMOS": {"password": "zramos", "role": "user"},
-    "LCHANQUETTI":{"password": "LCHANQUETTI1", "role": "user"}
+    "ZRAMOS": {"password": "zramos", "role": "user"}
 }
 
+
+def role_required(forbidden_roles):
+    """Decorador para restringir acceso según el rol del usuario."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if current_user.is_authenticated and current_user.role in forbidden_roles:
+                flash("No tienes permisos para acceder a esta página.", "danger")
+                return redirect(url_for("home"))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 # Modelo de usuario
@@ -92,16 +106,19 @@ def home():
 
 @app.route("/reporte")
 @login_required
+@role_required(["user"])  # Bloquear acceso a usuarios con rol "user"
 def reporte():
     return render_template("reporte.html", username=current_user.id, role=current_user.role)
 
 @app.route("/reporte_ventas")
 @login_required
+@role_required(["user"]) 
 def reporte_ventas():
     return render_template("reporte_ventas.html", username=current_user.id, role=current_user.role)
 
 @app.route("/analisis_clientes")
 @login_required
+@role_required(["user"]) 
 def analisis_clientes():
     return render_template("analisis_clientes.html", username=current_user.id, role=current_user.role)
 
@@ -293,6 +310,7 @@ def descargar_json(filename):
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
 
 
 # Crear una instancia de Dash dentro de Flask
