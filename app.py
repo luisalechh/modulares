@@ -391,7 +391,7 @@ def actualizar_grafica(start_date, end_date):
     df_filtrado = df[(df["FECHA DE REGISTRO"] >= start_date) & (df["FECHA DE REGISTRO"] <= end_date)]
     df_agrupado = df_filtrado.groupby(["ESTADO", "CANAL"]).size().reset_index(name="CANTIDAD")
     colores = {"Gestisaf": "blue", "Extranet": "orange"}
-    fig = px.bar(df_agrupado, x="ESTADO", y="CANTIDAD", color="CANAL", title="Estado vs Canal", barmode="group", color_discrete_map=colores)
+    fig = px.bar(df_agrupado, x="ESTADO", y="CANTIDAD", color="CANAL", title="Estado vs Cantidad", barmode="group", color_discrete_map=colores)
     return fig
 if __name__ == "__main__":
     app.run()
