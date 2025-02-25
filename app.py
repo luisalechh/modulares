@@ -26,8 +26,11 @@ from dash.dependencies import Input, Output
 
 from functools import wraps
 from flask import abort
-
-
+import base64
+from io import BytesIO
+import pandas as pd
+import datetime
+import requests 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
 app.config["UPLOAD_FOLDER"] = "uploads"
@@ -329,5 +332,66 @@ app_dash.layout = html.Div(children=[
     dcc.Graph(id='grafico', figure=fig)
 ])
 
+
+
+# ---------- DASH INTEGRADO ----------
+def obtener_token(username, password):
+    url = "https://gestisafapi.3420.pe/api/login_check"
+    payload = {"username": username, "password": password}
+    headers = {"Accept": "application/json", "Content-Type": "application/json"}
+    response = requests.post(url, json=payload, headers=headers)
+    if response.status_code == 200:
+        return response.json().get("authToken")
+    return None
+
+def obtener_reporteClientes(token):
+    url = "https://gestisafapi.3420.pe/api/fondos/reportes/excelRptClientes"
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        archivo_base64 = data["data"]["archivo"]
+        archivo_bytes = base64.b64decode(archivo_base64)
+        with BytesIO(archivo_bytes) as excel_file:
+            df = pd.read_excel(excel_file, header=5)
+        df.columns = df.columns.str.strip()
+        df["FECHA DE REGISTRO"] = pd.to_datetime(df["FECHA DE REGISTRO"], dayfirst=True, errors='coerce')
+        return df
+    return pd.DataFrame()  # Devolver un DataFrame vacío si la API falla
+
+# Obtener datos
+token = obtener_token("LCHANQUETTI", "Lchanquetti1")
+df = obtener_reporteClientes(token)
+
+# Definir fechas
+fecha_inicio = datetime.datetime(2025, 1, 1).strftime("%d/%m/%Y")  # 01/01/2025
+
+
+# Crear una instancia de Dash dentro de Flask
+app_dashi = dash.Dash(__name__, server=app, url_base_pathname='/dashi/')
+
+# Definir el layout de Dash
+app_dashi.layout = html.Div([
+    html.H1("Gráfica registro de clientes"),
+    dcc.DatePickerRange(
+        id='date-picker',
+        min_date_allowed=df["FECHA DE REGISTRO"].min(),
+        max_date_allowed=df["FECHA DE REGISTRO"].max(),
+        start_date=fecha_inicio,
+        end_date=df["FECHA DE REGISTRO"].max()
+    ),
+    dcc.Graph(id='bar-chart')
+])
+@app_dashi.callback(
+    Output('bar-chart', 'figure'),
+    Input('date-picker', 'start_date'),
+    Input('date-picker', 'end_date')
+)
+def actualizar_grafica(start_date, end_date):
+    df_filtrado = df[(df["FECHA DE REGISTRO"] >= start_date) & (df["FECHA DE REGISTRO"] <= end_date)]
+    df_agrupado = df_filtrado.groupby(["ESTADO", "CANAL"]).size().reset_index(name="CANTIDAD")
+    colores = {"Gestisaf": "blue", "Extranet": "orange"}
+    fig = px.bar(df_agrupado, x="ESTADO", y="CANTIDAD", color="CANAL", title="Estado vs Canal", barmode="group", color_discrete_map=colores)
+    return fig
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
