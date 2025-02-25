@@ -16,6 +16,13 @@ from spire.pdf.common import *
 from spire.pdf import *
 from spire.pdf.common import License as pdfLicense
 
+import dash
+from dash import html, dcc
+import plotly.express as px
+
+# Integrar Dash en la aplicación Flask
+from flask import Flask
+from dash.dependencies import Input, Output
 
 
 app = Flask(__name__)
@@ -286,6 +293,23 @@ def descargar_json(filename):
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+
+# Crear una instancia de Dash dentro de Flask
+app_dash = dash.Dash(__name__, server=app, url_base_pathname='/dash/')
+
+# Crear datos de ejemplo para el gráfico
+df = px.data.gapminder().query("year == 2007")  # Datos de ejemplo
+
+# Crear un gráfico de burbujas
+fig = px.scatter(df, x="gdpPercap", y="lifeExp", 
+                 size="pop", color="continent", 
+                 hover_name="country", log_x=True, size_max=60)
+
+# Definir el layout de Dash
+app_dash.layout = html.Div(children=[
+    dcc.Graph(id='grafico', figure=fig)
+])
 
 if __name__ == "__main__":
     app.run(debug=True)
