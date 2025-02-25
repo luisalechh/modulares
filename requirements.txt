@@ -19,7 +19,7 @@ narwhals==1.28.0
 nest-asyncio==1.6.0
 numpy==2.2.3
 packaging==24.2
-pandas==2.3.3
+pandas==2.2.3
 pillow==11.1.0
 plotly==6.0.0
 plum-dispatch==1.7.4
